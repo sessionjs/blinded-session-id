@@ -10,6 +10,7 @@
       },
       "devDependencies": {
         "@types/bun": "^1.1.6",
+        "@types/libsodium-wrappers-sumo": "0.7.8",
         "@types/lodash": "^4.17.7",
       },
       "peerDependencies": {
@@ -19,6 +20,10 @@
   },
   "packages": {
     "@types/bun": ["@types/bun@1.1.6", "", { "dependencies": { "bun-types": "1.1.17" } }, "sha512-uJgKjTdX0GkWEHZzQzFsJkWp5+43ZS7HC8sZPFnOwnSo1AsNl2q9o2bFeS23disNDqbggEgyFkKCHl/w8iZsMA=="],
+
+    "@types/libsodium-wrappers": ["@types/libsodium-wrappers@0.7.14", "", {}, "sha512-5Kv68fXuXK0iDuUir1WPGw2R9fOZUlYlSAa0ztMcL0s0BfIDTqg9GXz8K30VJpPP3sxWhbolnQma2x+/TfkzDQ=="],
+
+    "@types/libsodium-wrappers-sumo": ["@types/libsodium-wrappers-sumo@0.7.8", "", { "dependencies": { "@types/libsodium-wrappers": "*" } }, "sha512-N2+df4MB/A+W0RAcTw7A5oxKgzD+Vh6Ye7lfjWIi5SdTzVLfHPzxUjhwPqHLO5Ev9fv/+VHl+sUaUuTg4fUPqw=="],
 
     "@types/lodash": ["@types/lodash@4.17.7", "", {}, "sha512-8wTvZawATi/lsmNu10/j2hk1KEP0IvjubqPE3cu1Xz7xfXXt5oCq3SNUz4fMIP4XGF9Ky+Ue2tBA3hcS7LSBlA=="],
 

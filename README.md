@@ -27,13 +27,13 @@ await blindSessionId({
 - generateKAs — returns legacy and modern KAs as Uint8Array
 - convertToX25519Key, convertToEd25519Key — self explanatory
 
-## Credit
+## Acknowledgements
 
 Credit to li0ard, this code was mostly taken from [https://github.com/theinfinityway/session_id/](https://github.com/theinfinityway/session_id/)
 
-## Made for session.js
+## Made for Session.js
 
-Use Session messenger programmatically with [Session.js](https://github.com/sessionjs/client): Session bots, custom Session clients, and more.
+Use Session messenger programmatically with [Session.js](https://git.hloth.dev/session.js/client): Session bots, custom Session clients, and more.
 
 ## Donate
 

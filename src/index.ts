@@ -3,9 +3,47 @@
 
 /* eslint-disable prefer-const */
 
-import { cloneDeep } from 'lodash'
-import sodium from 'libsodium-wrappers-sumo'
-await sodium.ready
+import { ed25519 } from "@noble/curves/ed25519.js"
+import { bytesToHex, hexToBytes } from "@noble/curves/utils.js"
+import { blake2b } from "@noble/hashes/blake2.js"
+import { mod } from "@noble/curves/abstract/modular.js";
+
+function bytesToNumberLE(bytes: Uint8Array): bigint {
+  let value = 0n
+  for (let i = bytes.length - 1; i >= 0; i--) {
+    value = (value << 8n) + BigInt(bytes[i]!)
+  }
+  return value
+}
+
+function numberToBytesLE(num: bigint, length: number): Uint8Array {
+  const out = new Uint8Array(length)
+  let n = num
+  for (let i = 0; i < length; i++) {
+    out[i] = Number(n & 0xffn)
+    n >>= 8n
+  }
+  return out
+}
+
+function ed25519ScalarmultNoClamp(scalar32: Uint8Array, point32: Uint8Array): Uint8Array {
+  if (scalar32.length !== 32) {
+    throw new Error(`ed25519ScalarmultNoClamp: expected 32-byte scalar, got ${scalar32.length}`)
+  }
+  if (point32.length !== 32) {
+    throw new Error(`ed25519ScalarmultNoClamp: expected 32-byte point, got ${point32.length}`)
+  }
+
+  const L = ed25519.Point.Fn.ORDER
+  const s = bytesToNumberLE(scalar32) % L
+
+  const P = ed25519.Point.fromBytes(point32)
+  if (P.isSmallOrder()) {
+    throw new Error("ed25519ScalarmultNoClamp: invalid point (small order)")
+  }
+
+  return P.multiply(s).toBytes()
+}
 
 function gf(init?: number[]) {
   let i, r = new Float64Array(16)
@@ -577,31 +615,42 @@ function convertPublicKey(pk: Uint8Array) {
 }
 
 export const convertToEd25519Key = (key: string): string => {
-  const inbin = sodium.from_hex(key)
+  const inbin = hexToBytes(key)
   const xEd25519Key = crypto_sign_curve25519_pk_to_ed25519(inbin)
-  return sodium.to_hex(xEd25519Key)
+  return bytesToHex(xEd25519Key)
 }
 
 export const convertToX25519Key = (key: string): string => {
-  const inbin = sodium.from_hex(key)
-  const xEd25519Key = sodium.crypto_sign_ed25519_pk_to_curve25519(inbin)
-  return sodium.to_hex(xEd25519Key)
+  const inbin = hexToBytes(key)
+  const xEd25519Key = ed25519.utils.toMontgomery(inbin)
+  return bytesToHex(xEd25519Key)
 }
 
 function combineKeys(lhsKeyBytes: Uint8Array, rhsKeyBytes: Uint8Array) {
-  return sodium.crypto_scalarmult_ed25519_noclamp(lhsKeyBytes, rhsKeyBytes)
+  return ed25519ScalarmultNoClamp(lhsKeyBytes, rhsKeyBytes)
+}
+
+export function crypto_core_ed25519_scalar_reduce(
+  scalar: Uint8Array,
+): Uint8Array {
+  const scalarNum = bytesToNumberLE(scalar);
+  const result = mod(scalarNum, ed25519.Point.Fn.ORDER);
+
+  return numberToBytesLE(result, 32);
 }
 
 const generateBlindingFactor = (serverPk: string) => {
-  const hexServerPk = sodium.from_hex(serverPk)
-  const serverPkHash = sodium.crypto_generichash(64, hexServerPk)
-  return sodium.crypto_core_ed25519_scalar_reduce(serverPkHash)
+  const hexServerPk = hexToBytes(serverPk)
+  const serverPkHash = blake2b(hexServerPk, {
+    dkLen: 64,
+  })
+  return crypto_core_ed25519_scalar_reduce(serverPkHash)
 }
 
 export const generateKA = (sessionId: string, serverPk: string): Uint8Array => {
   const sessionIdNoPrefix = sessionId.substring(2)
   const kBytes = generateBlindingFactor(serverPk)
-  const xEd25519Key = sodium.from_hex(convertToEd25519Key(sessionIdNoPrefix))
+  const xEd25519Key = hexToBytes(convertToEd25519Key(sessionIdNoPrefix))
   const kA = combineKeys(kBytes, xEd25519Key)
 
   return kA
@@ -612,7 +661,9 @@ export const generateBlindedKeys = (sessionId: string, serverPk: string): Uint8A
   const key1 = kA
 
   const modifiedByte = kA[31] & 0x7F
-  const key2 = Buffer.concat([kA.slice(0, 31), Buffer.from([modifiedByte])])
+  const key2 = new Uint8Array(32)
+  key2.set(kA.slice(0, 31), 0)
+  key2[31] = modifiedByte
 
   return [key1, key2]
 }
@@ -625,8 +676,8 @@ export const blindSessionId = ({ sessionId, serverPk }: {
 
   const isKey2 = key1[31] & 0x80
   if (isKey2) {
-    return '15' + sodium.to_hex(key2)
+    return '15' + bytesToHex(key2)
   }
 
-  return '15' + sodium.to_hex(key1)
+  return '15' + bytesToHex(key1)
 }

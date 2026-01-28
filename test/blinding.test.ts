@@ -1,7 +1,5 @@
 import { expect, test } from 'bun:test'
 import { blindSessionId } from '../src/index'
-import sodium from 'libsodium-wrappers-sumo'
-await sodium.ready
 
 test('hloth in custom SOGS', () => {
   expect(

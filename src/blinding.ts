@@ -2,7 +2,8 @@ import { hexToBytes } from "@noble/curves/utils.js";
 import { SessionValidationError, SessionValidationErrorCode } from "@session.js/errors";
 import {
 	crypto_scalarmult_ed25519_noclamp,
-	crypto_sign_curve25519_pk_to_ed25519,
+	curve25519ToEd25519,
+	ed25519ToCurve25519,
 } from "./scalar-math";
 import { getBlindingK, hexRegex, keyToSessionId } from "./utils";
 
@@ -87,7 +88,7 @@ export function blindSessionId(
 			});
 		}
 		ed25519PublicKey = options.ed25519PublicKey;
-		x25519PublicKey = crypto_sign_curve25519_pk_to_ed25519(ed25519PublicKey);
+		x25519PublicKey = ed25519ToCurve25519(ed25519PublicKey);
 	} else {
 		if ("sessionId" in options) {
 			if (!hexRegex.test(options.sessionId) || options.sessionId.length % 2 !== 0) {
@@ -120,7 +121,7 @@ export function blindSessionId(
 			x25519PublicKey = options.x25519PublicKey;
 		}
 
-		ed25519PublicKey = crypto_sign_curve25519_pk_to_ed25519(x25519PublicKey);
+		ed25519PublicKey = curve25519ToEd25519(x25519PublicKey);
 	}
 
 	if (typeof options.sogsPublicKey === "string") {

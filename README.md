@@ -167,10 +167,7 @@ getBlindingK(sogsPublicKey);
 
 ## Acknowledgements
 
-Credit to li0ard for [https://github.com/theinfinityway/session_id/](https://github.com/theinfinityway/session_id/) (MIT license)
-
-Credit to [xHD-Wallet-API-ts](https://github.com/algorandfoundation/xHD-Wallet-API-ts) for scalar multiplication functions implementations (Apache-2.0 license)
-
+Credit to li0ard for [https://github.com/theinfinityway/session_id/](https://github.com/theinfinityway/session_id/) (MIT license) and src/scalar-math.ts
 ## Made for Session.js
 
 Use Session messenger programmatically with [Session.js](https://git.hloth.dev/session.js/client): Session bots, custom Session clients, and more.

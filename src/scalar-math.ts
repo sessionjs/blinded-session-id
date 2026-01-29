@@ -1,109 +1,40 @@
-// Credit: https://github.com/algorandfoundation/xHD-Wallet-API-ts/blob/2c5afbf6a1bed04ed952b65b754a36ed31669872/src/sumo.facade.ts
-// License: Apache 2.0: https://github.com/algorandfoundation/xHD-Wallet-API-ts/blob/main/LICENSE
-
 import { ed25519 } from "@noble/curves/ed25519.js";
 import { mod } from "@noble/curves/abstract/modular.js";
 import { bytesToNumberLE, numberToBytesLE } from "@noble/curves/utils.js";
 
-const crypto_scalarmult_ed25519_SCALARBYTES = 32;
-
-export function crypto_scalarmult_ed25519_base_noclamp(scalar: Uint8Array): Uint8Array {
-	if (scalar.length !== crypto_scalarmult_ed25519_SCALARBYTES) {
-		throw new Error(`scalar must be ${crypto_scalarmult_ed25519_SCALARBYTES} bytes`);
-	}
-
-	const scalarBigint = bytesToNumberLE(scalar);
-
-	try {
-		const point = ed25519.Point.BASE.multiply(scalarBigint);
-		return point.toBytes();
-	} catch {
-		if (scalarBigint === 0n) {
-			const identity = new Uint8Array(32);
-			identity[0] = 1;
-			return identity;
-		}
-
-		const reducedScalar = mod(scalarBigint, ed25519.Point.Fn.ORDER);
-
-		if (reducedScalar === 0n) {
-			const identity = new Uint8Array(32);
-			identity[0] = 1;
-			return identity;
-		}
-
-		const point = ed25519.Point.BASE.multiply(reducedScalar);
-		return point.toBytes();
-	}
-}
-
-export function crypto_core_ed25519_scalar_add(
-	scalarA: Uint8Array,
-	scalarB: Uint8Array,
-): Uint8Array {
+export function scalarAdd(scalarA: Uint8Array, scalarB: Uint8Array): Uint8Array {
 	const a = bytesToNumberLE(scalarA);
 	const b = bytesToNumberLE(scalarB);
-	const result = mod(a + b, ed25519.Point.Fn.ORDER);
+	const result = ed25519.Point.Fn.add(a, b);
 
 	return numberToBytesLE(result, 32);
 }
 
-export function crypto_core_ed25519_scalar_mul(
-	scalarA: Uint8Array,
-	scalarB: Uint8Array,
-): Uint8Array {
+export function scalarMul(scalarA: Uint8Array, scalarB: Uint8Array): Uint8Array {
 	const a = bytesToNumberLE(scalarA);
 	const b = bytesToNumberLE(scalarB);
-	const result = mod(a * b, ed25519.Point.Fn.ORDER);
+	const result = ed25519.Point.Fn.mul(a, b);
 
 	return numberToBytesLE(result, 32);
 }
 
-export function crypto_core_ed25519_scalar_reduce(scalar: Uint8Array): Uint8Array {
+export function scalarReduce(scalar: Uint8Array): Uint8Array {
 	const scalarNum = bytesToNumberLE(scalar);
 	const result = mod(scalarNum, ed25519.Point.Fn.ORDER);
 
 	return numberToBytesLE(result, 32);
 }
 
-export function crypto_sign_ed25519_sk_to_curve25519(edPrivKey: Uint8Array): Uint8Array {
-	const seed = edPrivKey.slice(0, 32);
+export function ed25519ToCurve25519(ed25519Pk: Uint8Array): Uint8Array {
+	const seed = ed25519Pk.slice(0, 32);
 	return ed25519.utils.toMontgomerySecret(seed);
 }
 
-export function crypto_sign_curve25519_pk_to_ed25519(x25519Pk: Uint8Array): Uint8Array {
-	const P = 2n ** 255n - 19n;
+export function curve25519ToEd25519(x25519Pk: Uint8Array): Uint8Array {
+	const f = ed25519.Point.Fp;
+	const x = f.fromBytes(x25519Pk);
 
-	let u = 0n;
-	for (let i = 0; i < x25519Pk.length; i++) {
-		u += BigInt(x25519Pk[i]) << (8n * BigInt(i));
-	}
-
-	const modPow = (base: bigint, exp: bigint, mod: bigint): bigint => {
-		let result = 1n;
-		base = base % mod;
-		while (exp > 0n) {
-			if (exp % 2n === 1n) result = (result * base) % mod;
-			exp = exp >> 1n;
-			base = (base * base) % mod;
-		}
-		return result;
-	};
-
-	const modInv = (a: bigint): bigint => modPow(a, P - 2n, P);
-
-	const y = (((u - 1n + P) % P) * modInv((u + 1n) % P)) % P;
-
-	const yBytes = new Uint8Array(32);
-	let yTemp = y;
-	for (let i = 0; i < 32; i++) {
-		yBytes[i] = Number(yTemp & 0xffn);
-		yTemp >>= 8n;
-	}
-
-	yBytes[31] &= 0x7f;
-
-	return yBytes;
+	return f.toBytes(f.div(f.sub(x, f.ONE), f.add(x, f.ONE)));
 }
 
 export function crypto_scalarmult_ed25519_noclamp(
@@ -130,4 +61,39 @@ export function crypto_scalarmult_ed25519_noclamp(
 	}
 
 	return P.multiply(s).toBytes();
+}
+
+// Credit: https://github.com/algorandfoundation/xHD-Wallet-API-ts/blob/2c5afbf6a1bed04ed952b65b754a36ed31669872/src/sumo.facade.ts
+// License: Apache 2.0: https://github.com/algorandfoundation/xHD-Wallet-API-ts/blob/main/LICENSE
+
+export function crypto_scalarmult_ed25519_base_noclamp(scalar: Uint8Array): Uint8Array {
+	if (scalar.length !== 32) {
+		throw new Error(
+			`crypto_scalarmult_ed25519_base_noclamp: expected 32-byte scalar, got ${scalar.length}`,
+		);
+	}
+
+	const scalarBigint = bytesToNumberLE(scalar);
+
+	try {
+		const point = ed25519.Point.BASE.multiply(scalarBigint);
+		return point.toBytes();
+	} catch {
+		if (scalarBigint === 0n) {
+			const identity = new Uint8Array(32);
+			identity[0] = 1;
+			return identity;
+		}
+
+		const reducedScalar = mod(scalarBigint, ed25519.Point.Fn.ORDER);
+
+		if (reducedScalar === 0n) {
+			const identity = new Uint8Array(32);
+			identity[0] = 1;
+			return identity;
+		}
+
+		const point = ed25519.Point.BASE.multiply(reducedScalar);
+		return point.toBytes();
+	}
 }

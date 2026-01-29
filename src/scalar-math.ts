@@ -25,6 +25,13 @@ export function scalarReduce(scalar: Uint8Array): Uint8Array {
 	return numberToBytesLE(result, 32);
 }
 
+export function invertScalar(scalar: Uint8Array): Uint8Array {
+	const s = bytesToNumberLE(scalar);
+	const inverted = ed25519.Point.Fn.inv(s);
+
+	return numberToBytesLE(inverted, 32);
+}
+
 export function multiplyPointToScalar(scalar: Uint8Array, point: Uint8Array): Uint8Array {
 	const L = ed25519.Point.Fn.ORDER;
 	const s = mod(bytesToNumberLE(scalar), L);

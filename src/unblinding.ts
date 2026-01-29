@@ -1,7 +1,7 @@
 import { ed25519 } from "@noble/curves/ed25519.js";
-import { bytesToNumberLE, numberToBytesLE, hexToBytes } from "@noble/curves/utils.js";
+import { hexToBytes } from "@noble/curves/utils.js";
 import { SessionValidationError, SessionValidationErrorCode } from "@session.js/errors";
-import { multiplyPointToScalar } from "./scalar-math";
+import { invertScalar, multiplyPointToScalar } from "./scalar-math";
 import { getBlindingK, hexRegex, keyToSessionId } from "./utils";
 
 export function unblindKey15({
@@ -13,7 +13,7 @@ export function unblindKey15({
 }) {
 	const blindingKInput = serverPublicKey;
 	const k = getBlindingK(blindingKInput);
-	const kInverted = numberToBytesLE(ed25519.Point.Fn.inv(bytesToNumberLE(k)), 32);
+	const kInverted = invertScalar(k);
 
 	const kA = multiplyPointToScalar(kInverted, blindedKey);
 

@@ -25,14 +25,7 @@ export function scalarReduce(scalar: Uint8Array): Uint8Array {
 	return numberToBytesLE(result, 32);
 }
 
-export function scalarMultEd25519NoClamp(scalar: Uint8Array, point: Uint8Array): Uint8Array {
-	if (scalar.length !== 32) {
-		throw new Error(`scalarMultEd25519NoClamp: expected 32-byte scalar, got ${scalar.length}`);
-	}
-	if (point.length !== 32) {
-		throw new Error(`scalarMultEd25519NoClamp: expected 32-byte point, got ${point.length}`);
-	}
-
+export function multiplyPointToScalar(scalar: Uint8Array, point: Uint8Array): Uint8Array {
 	const L = ed25519.Point.Fn.ORDER;
 	const s = mod(bytesToNumberLE(scalar), L);
 

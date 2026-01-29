@@ -1,6 +1,6 @@
 import { hexToBytes } from "@noble/curves/utils.js";
 import { SessionValidationError, SessionValidationErrorCode } from "@session.js/errors";
-import { scalarMultEd25519NoClamp, curve25519ToEd25519, ed25519ToCurve25519 } from "./scalar-math";
+import { multiplyPointToScalar, curve25519ToEd25519, ed25519ToCurve25519 } from "./scalar-math";
 import { getBlindingK, hexRegex, keyToSessionId } from "./utils";
 
 export function blindKey15({
@@ -13,7 +13,7 @@ export function blindKey15({
 	const blindingKInput = serverPublicKey;
 	const k = getBlindingK(blindingKInput);
 
-	const kA = scalarMultEd25519NoClamp(k, ed25519PublicKey);
+	const kA = multiplyPointToScalar(k, ed25519PublicKey);
 
 	return kA;
 }
@@ -30,7 +30,7 @@ export function blindKey25({
 	const blindingKInput = new Uint8Array([0x05, ...x25519PublicKey, ...serverPublicKey]);
 	const k = getBlindingK(blindingKInput);
 
-	const kA = scalarMultEd25519NoClamp(k, ed25519PublicKey);
+	const kA = multiplyPointToScalar(k, ed25519PublicKey);
 
 	return kA;
 }

@@ -37,25 +37,18 @@ export function curve25519ToEd25519(x25519Pk: Uint8Array): Uint8Array {
 	return f.toBytes(f.div(f.sub(x, f.ONE), f.add(x, f.ONE)));
 }
 
-export function crypto_scalarmult_ed25519_noclamp(
-	scalar32: Uint8Array,
-	point32: Uint8Array,
-): Uint8Array {
-	if (scalar32.length !== 32) {
-		throw new Error(
-			`crypto_scalarmult_ed25519_noclamp: expected 32-byte scalar, got ${scalar32.length}`,
-		);
+export function scalarMultEd25519NoClamp(scalar: Uint8Array, point: Uint8Array): Uint8Array {
+	if (scalar.length !== 32) {
+		throw new Error(`scalarMultEd25519NoClamp: expected 32-byte scalar, got ${scalar.length}`);
 	}
-	if (point32.length !== 32) {
-		throw new Error(
-			`crypto_scalarmult_ed25519_noclamp: expected 32-byte point, got ${point32.length}`,
-		);
+	if (point.length !== 32) {
+		throw new Error(`scalarMultEd25519NoClamp: expected 32-byte point, got ${point.length}`);
 	}
 
 	const L = ed25519.Point.Fn.ORDER;
-	const s = bytesToNumberLE(scalar32) % L;
+	const s = mod(bytesToNumberLE(scalar), L);
 
-	const P = ed25519.Point.fromBytes(point32);
+	const P = ed25519.Point.fromBytes(point);
 	if (P.isSmallOrder()) {
 		throw new Error("crypto_scalarmult_ed25519_noclamp: invalid point (small order)");
 	}
@@ -63,37 +56,21 @@ export function crypto_scalarmult_ed25519_noclamp(
 	return P.multiply(s).toBytes();
 }
 
-// Credit: https://github.com/algorandfoundation/xHD-Wallet-API-ts/blob/2c5afbf6a1bed04ed952b65b754a36ed31669872/src/sumo.facade.ts
-// License: Apache 2.0: https://github.com/algorandfoundation/xHD-Wallet-API-ts/blob/main/LICENSE
-
-export function crypto_scalarmult_ed25519_base_noclamp(scalar: Uint8Array): Uint8Array {
+export function scalarMultEd25519BaseNoClamp(scalar: Uint8Array): Uint8Array {
 	if (scalar.length !== 32) {
-		throw new Error(
-			`crypto_scalarmult_ed25519_base_noclamp: expected 32-byte scalar, got ${scalar.length}`,
-		);
+		throw new Error(`scalarMultEd25519BaseNoClamp: expected 32-byte scalar, got ${scalar.length}`);
 	}
 
-	const scalarBigint = bytesToNumberLE(scalar);
+	const L = ed25519.Point.Fn.ORDER;
+	const s = mod(bytesToNumberLE(scalar), L);
 
-	try {
-		const point = ed25519.Point.BASE.multiply(scalarBigint);
-		return point.toBytes();
-	} catch {
-		if (scalarBigint === 0n) {
-			const identity = new Uint8Array(32);
-			identity[0] = 1;
-			return identity;
-		}
+	const P = ed25519.Point.BASE;
 
-		const reducedScalar = mod(scalarBigint, ed25519.Point.Fn.ORDER);
-
-		if (reducedScalar === 0n) {
-			const identity = new Uint8Array(32);
-			identity[0] = 1;
-			return identity;
-		}
-
-		const point = ed25519.Point.BASE.multiply(reducedScalar);
-		return point.toBytes();
+	if (s === 0n) {
+		const identity = new Uint8Array(32);
+		identity[0] = 1;
+		return identity;
 	}
+
+	return P.multiply(s).toBytes();
 }

@@ -92,19 +92,19 @@ describe("25-prefixed", () => {
 			sogsPublicKey: "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789",
 			type: "25",
 		}),
-	).toContain("3b991dcbba44cfdb45d5b38880d95cff723309e3ece6fd01415ad5fa1dccc7ac");
+	).toContain("253b991dcbba44cfdb45d5b38880d95cff723309e3ece6fd01415ad5fa1dccc7ac");
 	expect(
 		blindSessionId({
 			sessionId: "05fe94b7ad4b7f1cc1bb92671f1f0d243f226e115b33770465e82b503fc3e96e1f",
 			sogsPublicKey: "00cdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789",
 			type: "25",
 		}),
-	).toContain("98589c7885b56cbeae6ab7b4224f202815520a54995872cb1833b44db6401c8d");
+	).toContain("2598589c7885b56cbeae6ab7b4224f202815520a54995872cb1833b44db6401c8d");
 	expect(
 		blindSessionId({
 			sessionId: "0505c9a9bf178fa644d44bebf628716dc7f2df3d0842e97881962c723699152073",
 			sogsPublicKey: "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789",
 			type: "25",
 		}),
-	).toContain("a69cc6884530bf8498d22892e563716c4742f2845a7eb608de2aecbe7b6b5996");
+	).toContain("25a69cc6884530bf8498d22892e563716c4742f2845a7eb608de2aecbe7b6b5996");
 });

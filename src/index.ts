@@ -46,7 +46,7 @@ export function blindKey25({
 	const blindingKInput = new Uint8Array([0x05, ...x25519PublicKey, ...serverPublicKey]);
 	const k = getBlindingK(blindingKInput);
 
-	const kA = crypto_scalarmult_ed25519_noclamp(ed25519PublicKey, k);
+	const kA = crypto_scalarmult_ed25519_noclamp(k, ed25519PublicKey);
 
 	const kA2 = new Uint8Array(32);
 	kA2.set(kA);

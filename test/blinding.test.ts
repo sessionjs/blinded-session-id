@@ -1,7 +1,8 @@
 import { expect, test, describe } from "bun:test";
 import { blindSessionId } from "../src/index";
+import { hexToBytes } from "@noble/hashes/utils.js";
 
-describe("15-prefixed", () => {
+describe("15-prefixed non-determenistic", () => {
 	test("hloth in custom SOGS", () => {
 		expect(
 			blindSessionId({
@@ -82,6 +83,53 @@ describe("15-prefixed", () => {
 				type: "15",
 			}),
 		).toContain("15383d0a3ba605abe3b5b7343102be3fc0026056b9812e06f6daee3be62a6a56e3");
+	});
+});
+
+describe("15-prefixed determenistic", () => {
+	test("hloth in custom SOGS", () => {
+		expect(
+			blindSessionId({
+				ed25519PublicKey: hexToBytes(
+					"f037a3095b72f7d45dd90cf5d572fbb6c35f2e04d355b1d9c9da035fca849e97",
+				),
+				sogsPublicKey: "cb4fd6199b84dc3664f0373354341a01007ecaa99a388496fe8775b9b76a253b",
+				type: "15",
+			}),
+		).toEqual("15383d0a3ba605abe3b5b7343102be3fc0026056b9812e06f6daee3be62a6a56e3");
+	});
+	test("hloth in custom SOGS 2", () => {
+		expect(
+			blindSessionId({
+				ed25519PublicKey: hexToBytes(
+					"f037a3095b72f7d45dd90cf5d572fbb6c35f2e04d355b1d9c9da035fca849e97",
+				),
+				sogsPublicKey: "ac9c872e525a58970df6971655abb944a30b38853442a793b29843d20795e840",
+				type: "15",
+			}),
+		).toEqual("15264c132e2e72a9c50b7a981eac11a48b3e51ae5a0ea45ea47deb519a3fa76612");
+	});
+	test("custom blinded id", () => {
+		expect(
+			blindSessionId({
+				ed25519PublicKey: hexToBytes(
+					"f037a3095b72f7d45dd90cf5d572fbb6c35f2e04d355b1d9c9da035fca849e97",
+				),
+				sogsPublicKey: "cb4fd6199b84dc3664f0373354341a01007ecaa99a388496fe8775b9b76a253b",
+				type: "15",
+			}),
+		).toEqual("15383d0a3ba605abe3b5b7343102be3fc0026056b9812e06f6daee3be62a6a56e3");
+	});
+	test("custom blinded id", () => {
+		expect(
+			blindSessionId({
+				ed25519PublicKey: hexToBytes(
+					"f037a3095b72f7d45dd90cf5d572fbb6c35f2e04d355b1d9c9da035fca849e97",
+				),
+				sogsPublicKey: "cb4fd6199b84dc3664f0373354341a01007ecaa99a388496fe8775b9b76a253b",
+				type: "15",
+			}),
+		).toEqual("15383d0a3ba605abe3b5b7343102be3fc0026056b9812e06f6daee3be62a6a56e3");
 	});
 });
 

@@ -1,9 +1,9 @@
 // Credit: https://github.com/algorandfoundation/xHD-Wallet-API-ts/blob/2c5afbf6a1bed04ed952b65b754a36ed31669872/src/sumo.facade.ts
 // License: Apache 2.0: https://github.com/algorandfoundation/xHD-Wallet-API-ts/blob/main/LICENSE
 
-import { bytesToNumberLE, numberToBytesLE } from "@noble/curves/utils.js";
-import { mod } from "@noble/curves/abstract/modular.js";
 import { ed25519 } from "@noble/curves/ed25519.js";
+import { mod } from "@noble/curves/abstract/modular.js";
+import { bytesToNumberLE, numberToBytesLE } from "@noble/curves/utils.js";
 
 const crypto_scalarmult_ed25519_SCALARBYTES = 32;
 

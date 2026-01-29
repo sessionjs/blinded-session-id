@@ -25,18 +25,6 @@ export function scalarReduce(scalar: Uint8Array): Uint8Array {
 	return numberToBytesLE(result, 32);
 }
 
-export function ed25519ToCurve25519(ed25519Pk: Uint8Array): Uint8Array {
-	const seed = ed25519Pk.slice(0, 32);
-	return ed25519.utils.toMontgomerySecret(seed);
-}
-
-export function curve25519ToEd25519(x25519Pk: Uint8Array): Uint8Array {
-	const f = ed25519.Point.Fp;
-	const x = f.fromBytes(x25519Pk);
-
-	return f.toBytes(f.div(f.sub(x, f.ONE), f.add(x, f.ONE)));
-}
-
 export function scalarMultEd25519NoClamp(scalar: Uint8Array, point: Uint8Array): Uint8Array {
 	if (scalar.length !== 32) {
 		throw new Error(`scalarMultEd25519NoClamp: expected 32-byte scalar, got ${scalar.length}`);
@@ -50,27 +38,20 @@ export function scalarMultEd25519NoClamp(scalar: Uint8Array, point: Uint8Array):
 
 	const P = ed25519.Point.fromBytes(point);
 	if (P.isSmallOrder()) {
-		throw new Error("crypto_scalarmult_ed25519_noclamp: invalid point (small order)");
+		throw new Error("scalarMultEd25519NoClamp: invalid point (small order)");
 	}
 
 	return P.multiply(s).toBytes();
 }
 
-export function scalarMultEd25519BaseNoClamp(scalar: Uint8Array): Uint8Array {
-	if (scalar.length !== 32) {
-		throw new Error(`scalarMultEd25519BaseNoClamp: expected 32-byte scalar, got ${scalar.length}`);
-	}
+export function ed25519ToCurve25519(ed25519Pk: Uint8Array): Uint8Array {
+	const seed = ed25519Pk.slice(0, 32);
+	return ed25519.utils.toMontgomerySecret(seed);
+}
 
-	const L = ed25519.Point.Fn.ORDER;
-	const s = mod(bytesToNumberLE(scalar), L);
+export function curve25519ToEd25519(x25519Pk: Uint8Array): Uint8Array {
+	const f = ed25519.Point.Fp;
+	const x = f.fromBytes(x25519Pk);
 
-	const P = ed25519.Point.BASE;
-
-	if (s === 0n) {
-		const identity = new Uint8Array(32);
-		identity[0] = 1;
-		return identity;
-	}
-
-	return P.multiply(s).toBytes();
+	return f.toBytes(f.div(f.sub(x, f.ONE), f.add(x, f.ONE)));
 }

@@ -615,17 +615,17 @@ function convertPublicKey(pk: Uint8Array) {
 	return z;
 }
 
-export const convertToEd25519Key = (key: string): string => {
+export function convertToEd25519Key(key: string): string {
 	const inbin = hexToBytes(key);
 	const xEd25519Key = crypto_sign_curve25519_pk_to_ed25519(inbin);
 	return bytesToHex(xEd25519Key);
-};
+}
 
-export const convertToX25519Key = (key: string): string => {
+export function convertToX25519Key(key: string): string {
 	const inbin = hexToBytes(key);
 	const xEd25519Key = ed25519.utils.toMontgomery(inbin);
 	return bytesToHex(xEd25519Key);
-};
+}
 
 function combineKeys(lhsKeyBytes: Uint8Array, rhsKeyBytes: Uint8Array) {
 	return ed25519ScalarmultNoClamp(lhsKeyBytes, rhsKeyBytes);
@@ -638,24 +638,24 @@ export function crypto_core_ed25519_scalar_reduce(scalar: Uint8Array): Uint8Arra
 	return numberToBytesLE(result, 32);
 }
 
-const generateBlindingFactor = (serverPk: string) => {
+function generateBlindingFactor(serverPk: string) {
 	const hexServerPk = hexToBytes(serverPk);
 	const serverPkHash = blake2b(hexServerPk, {
 		dkLen: 64,
 	});
 	return crypto_core_ed25519_scalar_reduce(serverPkHash);
-};
+}
 
-export const generateKA = (sessionId: string, serverPk: string): Uint8Array => {
+export function generateKA(sessionId: string, serverPk: string): Uint8Array {
 	const sessionIdNoPrefix = sessionId.substring(2);
 	const kBytes = generateBlindingFactor(serverPk);
 	const xEd25519Key = hexToBytes(convertToEd25519Key(sessionIdNoPrefix));
 	const kA = combineKeys(kBytes, xEd25519Key);
 
 	return kA;
-};
+}
 
-export const generateBlindedKeys = (sessionId: string, serverPk: string): Uint8Array[] => {
+export function generateBlindedKeys(sessionId: string, serverPk: string): Uint8Array[] {
 	const kA = generateKA(sessionId, serverPk);
 	const key1 = kA;
 
@@ -665,15 +665,15 @@ export const generateBlindedKeys = (sessionId: string, serverPk: string): Uint8A
 	key2[31] = modifiedByte;
 
 	return [key1, key2];
-};
+}
 
-export const blindSessionId = ({
+export function blindSessionId({
 	sessionId,
 	serverPk,
 }: {
 	sessionId: string;
 	serverPk: string;
-}): string => {
+}): string {
 	const [key1, key2] = generateBlindedKeys(sessionId, serverPk);
 
 	const isKey2 = key1[31] & 0x80;
@@ -682,4 +682,4 @@ export const blindSessionId = ({
 	}
 
 	return "15" + bytesToHex(key1);
-};
+}

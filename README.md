@@ -1,6 +1,6 @@
 # @session.js/blinded-session-id
 
-Utility JavaScript library with methods to work with Session's blinded Session ID. Uses [noble v2](https://www.npmjs.com/package/@noble/ciphers) under the hood.
+Utility JavaScript library with methods to work with Session's blinded Session ID. Uses @noble/curves v2, @noble/hashes v2 and @session.js/scalars under the hood.
 
 Example of unblinded Session ID (05-prefixed):
 `057aeb66e45660c3bdfb7c62706f6440226af43ec13f3b6f899c1dd4db1b8fce5b`
@@ -23,7 +23,6 @@ Blinded IDs are used on Session SOGS to conceal identity of room's users.
 			- [Unblinding 25-prefixed Session IDs](#unblinding-25-prefixed-session-ids)
 		- [Advanced usage](#advanced-usage)
 			- [getBlindingK](#getblindingk)
-	- [Acknowledgements](#acknowledgements)
 	- [Made for Session.js](#made-for-sessionjs)
 	- [Donate](#donate)
 	- [License](#license)
@@ -155,7 +154,7 @@ Unblinding 25-prefixed Session IDs is impossible.
 generates a hash for blinding/unblinding using blake2b
 
 ```ts
-import { getBlindingK } from "@session.js/blinded-session-id/utils.js";
+import { getBlindingK } from "@session.js/blinded-session-id/utils";
 
 const sogsPublicKey = new Uint8Array([
 	203, 79, 214, 25, 155, 132, 220, 54, 100, 240, 55, 51, 84, 52, 26, 1, 0, 126, 202, 169, 154, 56,
@@ -165,9 +164,6 @@ getBlindingK(sogsPublicKey);
 // => Uint8Array(32) [ 27, 203, 111, 10, 221, 88, 187, 146, 221, 11, 206, 55, 7, 86, 218, 223, 21, 123, 29, 214, 198, 182, 3, 40, 188, 123, 190, 73, 35, 122, 140, 13 ]
 ```
 
-## Acknowledgements
-
-Credit to li0ard for [https://github.com/theinfinityway/session_id/](https://github.com/theinfinityway/session_id/) (MIT license) and src/scalar-math.ts
 ## Made for Session.js
 
 Use Session messenger programmatically with [Session.js](https://git.hloth.dev/session.js/client): Session bots, custom Session clients, and more.

@@ -1,6 +1,6 @@
 import { hexToBytes } from "@noble/curves/utils.js";
 import { SessionValidationError, SessionValidationErrorCode } from "@session.js/errors";
-import { multiplyPointToScalar, curve25519ToEd25519, ed25519ToCurve25519 } from "./scalar-math";
+import { multiplyPointToScalar, curve25519ToEd25519, ed25519ToCurve25519 } from "@session.js/scalars";
 import { getBlindingK, hexRegex, keyToSessionId } from "./utils";
 
 export function blindKey15({

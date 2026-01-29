@@ -1,7 +1,7 @@
 import { ed25519 } from "@noble/curves/ed25519.js";
 import { hexToBytes } from "@noble/curves/utils.js";
 import { SessionValidationError, SessionValidationErrorCode } from "@session.js/errors";
-import { invertScalar, multiplyPointToScalar } from "./scalar-math";
+import { invertScalar, multiplyPointToScalar } from "@session.js/scalars";
 import { getBlindingK, hexRegex, keyToSessionId } from "./utils";
 
 export function unblindKey15({

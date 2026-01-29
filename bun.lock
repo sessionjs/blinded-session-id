@@ -12,8 +12,6 @@
       "devDependencies": {
         "@eslint/compat": "^2.0.1",
         "@eslint/js": "^9.39.2",
-        "@session.js/keypair": "^1.0.8",
-        "@session.js/mnemonic": "^1.0.6",
         "@types/bun": "latest",
         "eslint-config-prettier": "^10.1.8",
         "prettier": "^3.8.0",
@@ -58,10 +56,6 @@
     "@noble/hashes": ["@noble/hashes@2.0.1", "", {}, "sha512-XlOlEbQcE9fmuXxrVTXCTlG2nlRXa9Rj3rr5Ue/+tX+nmkgbX720YHh0VR3hBF9xDvwnb8D2shVGOwNx+ulArw=="],
 
     "@session.js/errors": ["@session.js/errors@1.0.11", "", { "peerDependencies": { "typescript": "^5.0.0" } }, "sha512-r06Bb/g5P8HjXZF8u/36RFeLe974TbczB227pvTeJtA27PshH8M4o3DBpFl728+6THuIAke8SdOmdNGaElCc9A=="],
-
-    "@session.js/keypair": ["@session.js/keypair@1.0.8", "", { "dependencies": { "@noble/curves": "^2.0.1" }, "peerDependencies": { "typescript": "^5.0.0" } }, "sha512-QRq/Qd6EHGMCiaAPA06g+QPT8Y9YW8vTggIn7GzodWQci7Wmyirr375+HHrbkKdNusHpizN/zJPQsTLPT5cAbw=="],
-
-    "@session.js/mnemonic": ["@session.js/mnemonic@1.0.6", "", { "dependencies": { "@session.js/errors": "^1.0.11" }, "peerDependencies": { "typescript": "^5.0.0" } }, "sha512-pg/dOttuDAKRWGon4lA7e6rCLkxaW4Z5BrVneusk0WGlUARH3I02rZbrLflw5FhXseQeowLhdK7mKnjM3Ghx1A=="],
 
     "@types/bun": ["@types/bun@1.3.6", "", { "dependencies": { "bun-types": "1.3.6" } }, "sha512-uWCv6FO/8LcpREhenN1d1b6fcspAB+cefwD7uti8C8VffIv0Um08TKMn98FynpTiU38+y2dUO55T11NgDt8VAA=="],
 

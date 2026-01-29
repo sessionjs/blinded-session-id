@@ -1,6 +1,6 @@
 {
 	"name": "@session.js/blinded-session-id",
-	"version": "1.0.6",
+	"version": "1.0.7",
 	"description": "Utility JavaScript library with methods to work with Session's blinded Session ID",
 	"homepage": "https://git.hloth.dev/session.js/blinded-session-id#readme",
 	"bugs": {

@@ -6,7 +6,7 @@ import { blake2b } from "@noble/hashes/blake2.js";
 import {
 	crypto_core_ed25519_scalar_reduce,
 	crypto_sign_curve25519_pk_to_ed25519,
-	ed25519ScalarmultNoClamp,
+	crypto_scalarmult_ed25519_noclamp,
 } from "./scalar-math";
 
 function generateBlindingFactor(serverPk: Uint8Array) {
@@ -18,7 +18,7 @@ function generateBlindingFactor(serverPk: Uint8Array) {
 
 export function generateKA(ed25519Pk: Uint8Array, serverPk: Uint8Array): Uint8Array {
 	const kBytes = generateBlindingFactor(serverPk);
-	const kA = ed25519ScalarmultNoClamp(kBytes, ed25519Pk);
+	const kA = crypto_scalarmult_ed25519_noclamp(kBytes, ed25519Pk);
 
 	return kA;
 }
